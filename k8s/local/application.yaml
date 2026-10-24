@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: payments-service}
+  template:
+    metadata:
+      labels: {app: payments-service}
+    spec:
+      initContainers:
+        - name: wait-for-dependencies
+          image: busybox:1.36
+          command: ["sh", "-c", "until nc -z postgres 5432 && nc -z kafka 9092; do sleep 2; done"]
+      containers:
+        - name: payments-service
+          image: payments-service:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - {containerPort: 8080}
+          env:
+            - {name: SPRING_DATASOURCE_URL, value: 'jdbc:postgresql://postgres:5432/payments'}
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom: {secretKeyRef: {name: payments-db-local, key: username}}
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom: {secretKeyRef: {name: payments-db-local, key: password}}
+            - {name: SPRING_KAFKA_BOOTSTRAP_SERVERS, value: 'kafka:9092'}
+          readinessProbe:
+            httpGet: {path: /actuator/health/readiness, port: 8080}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: {path: /actuator/health/liveness, port: 8080}
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {memory: 768Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payments-service
+spec:
+  selector: {app: payments-service}
+  ports:
+    - {port: 8080, targetPort: 8080}

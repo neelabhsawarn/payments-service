@@ -1,0 +1,6 @@
+aws_region              = "eu-west-2"
+deploy_service          = false
+image_tag               = "demo"
+kafka_bootstrap_servers = "" # Must be an accessible broker before enabling ECS service
+kafka_security_protocol = "SSL"
+allowed_cidr            = "" # Default: no inbound port 8080

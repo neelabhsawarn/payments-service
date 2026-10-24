@@ -1,0 +1,14 @@
+{
+  "uid": "payments-portfolio", "title": "Payments Service — Reliability",
+  "tags": ["payments", "java", "kafka"], "timezone": "browser",
+  "schemaVersion": 39, "version": 1, "refresh": "10s",
+  "time": {"from": "now-30m", "to": "now"},
+  "panels": [
+    {"id": 1, "title": "API payment requests / minute", "type": "timeseries", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}, "datasource": "Prometheus", "targets": [{"expr": "sum by (outcome) (rate(payments_api_requests_total[5m])) * 60", "legendFormat": "{{outcome}}"}]},
+    {"id": 2, "title": "Outbox published / minute", "type": "timeseries", "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}, "datasource": "Prometheus", "targets": [{"expr": "sum(rate(payments_outbox_published_total[5m])) * 60", "legendFormat": "published"}]},
+    {"id": 3, "title": "Consumer events / minute", "type": "timeseries", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}, "datasource": "Prometheus", "targets": [{"expr": "sum by (outcome) (rate(payments_consumer_handled_total[5m])) * 60", "legendFormat": "{{outcome}}"}]},
+    {"id": 4, "title": "HTTP 5xx / minute", "type": "timeseries", "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}, "datasource": "Prometheus", "targets": [{"expr": "sum(rate(http_server_requests_seconds_count{status=~\"5..\"}[5m])) * 60", "legendFormat": "5xx"}]},
+    {"id": 5, "title": "JVM used memory (bytes)", "type": "timeseries", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}, "datasource": "Prometheus", "targets": [{"expr": "sum(jvm_memory_used_bytes)", "legendFormat": "JVM"}]},
+    {"id": 6, "title": "Active DB connections", "type": "timeseries", "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}, "datasource": "Prometheus", "targets": [{"expr": "hikaricp_connections_active", "legendFormat": "active"}]}
+  ]
+}

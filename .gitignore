@@ -1,0 +1,13 @@
+target/
+.idea/
+.vscode/
+*.iml
+.DS_Store
+.env
+*.tfstate
+*.tfstate.*
+*.tfplan
+.terraform/
+*.tfvars
+!.tfvars.example
+*.log
